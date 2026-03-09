@@ -2,15 +2,12 @@ from flask import Flask, request, render_template_string
 from pysnmp.hlapi import (
     ObjectType, ObjectIdentity, getCmd, nextCmd, SnmpEngine, CommunityData, UdpTransportTarget, ContextData,
 )
-from sshtunnel import SSHTunnelForwarder
 import os
 
 app = Flask(__name__)
 
 
-# SSH and SNMP configuration
-# We need to set up a tunnel to get to R2
-R1_HOST = "R1Boneh" 
+# SNMP configuration (direct to R2)
 R2_IP = "172.16.1.2"
 SNMP_PORT = 161
 COMMUNITY = "public"
@@ -129,7 +126,7 @@ def grab_snmp(oid, port):
     iterator = getCmd(
         SnmpEngine(),
         CommunityData(COMMUNITY, mpModel=1),
-        UdpTransportTarget(("127.0.0.1", port), timeout=2, retries=1),
+        UdpTransportTarget((R2_IP, SNMP_PORT), timeout=2, retries=1),
         ContextData(),
         ObjectType(ObjectIdentity(oid)),
     )
@@ -150,7 +147,7 @@ def get_iface_index(iface_name, port):
     for err, stat, idx, binds in nextCmd(
         SnmpEngine(),
         CommunityData(COMMUNITY, mpModel=1),
-        UdpTransportTarget(("127.0.0.1", port), timeout=2, retries=1),
+        UdpTransportTarget((R2_IP, SNMP_PORT), timeout=2, retries=1),
         ContextData(),
         ObjectType(ObjectIdentity(base_oid)),
         lexicographicMode=False,
@@ -177,28 +174,20 @@ def index():
         fields = [value1, value2, value3]
 
         try:
-            # SSH tunnel to R1, then SNMP to R2
-            with SSHTunnelForwarder(
-                (R1_HOST, 22),
-                remote_bind_address=(R2_IP, SNMP_PORT),
-                local_bind_address=("127.0.0.1",),
-                ssh_config_file=os.path.expanduser("~/.ssh/config"),
-            ) as tunnel:
-                port = tunnel.local_bind_port
-                idx = get_iface_index(TARGET_INTERFACE, port)
-                if idx is None:
-                    error = f"Couldn't find interface {TARGET_INTERFACE} on R2."
-                else:
-                    results = {}
-                    for field in fields:
-                        if not field:
-                            continue
-                        oid = OID_MAP.get(field)
-                        try:
-                            full_oid = f"{oid}.{idx}"
-                            results[field] = grab_snmp(full_oid, port)
-                        except Exception as e:
-                            results[field] = f"Error: {e}"
+            idx = get_iface_index(TARGET_INTERFACE, SNMP_PORT)
+            if idx is None:
+                error = f"Couldn't find interface {TARGET_INTERFACE} on R2."
+            else:
+                results = {}
+                for field in fields:
+                    if not field:
+                        continue
+                    oid = OID_MAP.get(field)
+                    try:
+                        full_oid = f"{oid}.{idx}"
+                        results[field] = grab_snmp(full_oid, SNMP_PORT)
+                    except Exception as e:
+                        results[field] = f"Error: {e}"
         except Exception as e:
             error = str(e)
 
