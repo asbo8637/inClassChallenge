@@ -10,9 +10,7 @@ app = Flask(__name__)
 
 # SSH and SNMP configuration
 # We need to set up a tunnel to get to R2
-R1_IP = "198.51.100.1"
-R1_USER = "root"
-R1_PASS = "root" 
+R1_HOST = "R1Boneh" 
 R2_IP = "172.16.1.2"
 SNMP_PORT = 161
 COMMUNITY = "public"
@@ -181,11 +179,10 @@ def index():
         try:
             # SSH tunnel to R1, then SNMP to R2
             with SSHTunnelForwarder(
-                (R1_IP, 22),
-                ssh_username=R1_USER,
-                ssh_password=R1_PASS,
+                (R1_HOST, 22),
                 remote_bind_address=(R2_IP, SNMP_PORT),
                 local_bind_address=("127.0.0.1",),
+                ssh_config_file=os.path.expanduser("~/.ssh/config"),
             ) as tunnel:
                 port = tunnel.local_bind_port
                 idx = get_iface_index(TARGET_INTERFACE, port)
