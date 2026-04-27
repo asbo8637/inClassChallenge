@@ -20,9 +20,12 @@ conn = ConnectHandler(**r1)
 conn.enable()
 
 print("Connected to R1")
+output = conn.send_command_timing("show ip interface brief")
+print(output)
+print("-----")
 
 # SSH from R1 to R2
-print("\nSSH from R1 to R2...")
+print("SSH from R1 to R2...")
 output = conn.send_command_timing(f"ssh -l {USERNAME} {R2_IP}")
 
 if "yes/no" in output:
@@ -31,6 +34,10 @@ if "yes/no" in output:
 if "Password" in output or "password" in output:
     output += conn.send_command_timing(PASSWORD)
 
+print(output)
+
+print("trying command on R2")
+output = conn.send_command_timing("show ip interface brief")
 print(output)
 
 # Now SSH from R2 to R3
@@ -45,7 +52,7 @@ if "Password" in output or "password" in output:
 
 print(output)
 
-print("\nNow trying command on R3...")
+print("trying command on R3...")
 output = conn.send_command_timing("show ip interface brief")
 print(output)
 
