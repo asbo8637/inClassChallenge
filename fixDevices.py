@@ -51,7 +51,7 @@ print(output)
 
 print("Applying R2 config")
 for command in R2_commands:
-    output = conn.send_command(command)
+    output = conn.send_command_timing(command, delay_factor=2)
     print(output)
 
 conn.disconnect()
