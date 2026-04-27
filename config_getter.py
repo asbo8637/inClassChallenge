@@ -23,6 +23,7 @@ print("Connected to R1")
 output = conn.send_command_timing("show ip interface brief")
 print(output)
 print("-----")
+# Noticed ethernet2 has wrong ip address. 
 
 # SSH from R1 to R2
 print("SSH from R1 to R2...")
