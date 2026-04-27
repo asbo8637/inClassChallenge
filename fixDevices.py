@@ -24,8 +24,11 @@ R1_commands = [
 ]
 
 R2_commands = [
+    "configure terminal",
     "interface GigabitEthernet2/0",
     "no shutdown",
+    "end",
+    "write memory",
 ]
 
 conn = ConnectHandler(**r1_conn_configs)
@@ -43,10 +46,12 @@ if "yes/no" in output:
 
 if "Password" in output or "password" in output:
     output += conn.send_command_timing(PASSWORD)
+
 print(output)
 
 print("Applying R2 config")
-output = conn.send_config_set(R2_commands)
-print(output)
+for command in R2_commands:
+    output = conn.send_command(command)
+    print(output)
 
 conn.disconnect()
