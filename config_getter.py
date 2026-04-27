@@ -59,7 +59,7 @@ print("trying command on R3")
 output = conn.send_command_timing("show ip interface brief")
 print(output)
 output = conn.send_command_timing("show ip ospf interface brief")
-print(output) 
+print(output) # R3 loopback is not in the area
 
 
 conn.disconnect()

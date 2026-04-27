@@ -31,6 +31,14 @@ R2_commands = [
     "write memory",
 ]
 
+R3_commands = [
+    "configure terminal",
+    "interface Loopback0",
+    "ip ospf 1 area 0",
+    "end",
+    "write memory"
+]
+
 conn = ConnectHandler(**r1_conn_configs)
 conn.enable()
 
@@ -51,6 +59,23 @@ print(output)
 
 print("Applying R2 config")
 for command in R2_commands:
+    output = conn.send_command_timing(command, delay_factor=2)
+    print(output)
+
+
+print("SSH from R2 to R3")
+output = conn.send_command_timing(f"ssh -l {USERNAME} {R3_IP}")
+
+if "yes/no" in output:
+    output += conn.send_command_timing("yes")
+
+if "Password" in output or "password" in output:
+    output += conn.send_command_timing(PASSWORD)
+
+print(output)
+
+print("Applying R3 config")
+for command in R3_commands:
     output = conn.send_command_timing(command, delay_factor=2)
     print(output)
 
