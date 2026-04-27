@@ -10,7 +10,7 @@ R1 = {
 
 my_commands = [
     "interface GigabitEthernet2/0",
-    "ip address 198.52.100.2 255.255.255.0",
+    "ip address 198.52.100.1 255.255.255.0",
     "no shutdown",
 ]
 
