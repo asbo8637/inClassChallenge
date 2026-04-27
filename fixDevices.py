@@ -23,6 +23,11 @@ R1_commands = [
     "no shutdown",
 ]
 
+R1_commands_2 = [
+    "router ospf 1",
+    "network 198.51.100.0 0.0.0.255 area 0"
+]
+
 R2_commands = [
     "configure terminal",
     "interface GigabitEthernet2/0",
@@ -44,6 +49,10 @@ conn.enable()
 
 print("Applying R1 config")
 output = conn.send_config_set(R1_commands)
+print(output)
+
+print("Applying R1 OSPF config")
+output = conn.send_config_set(R1_commands_2)
 print(output)
 
 print("SSH from R1 to R2")
