@@ -23,25 +23,24 @@ HTML = """
 
 @app.route("/", methods=["GET"])
 def index():
-    return render_template_string(HTML, output="")
+    return render_template_string(HTML,output="")
 
 @app.route("/traceroute", methods=["POST"])
 def traceroute():
-    try:
-        command = [
-            "traceroute",
-            "-i", INTERFACE,
-            R3_LOOPBACK_IP
-        ]
+    command = [
+        "traceroute",
+        "-i", INTERFACE,
+        R3_LOOPBACK_IP
+    ]
 
-        result = subprocess.run(
-            command,
-            capture_output=True,
-            text=True,
-            timeout=45
-        )
+    result = subprocess.run(
+        command,
+        capture_output=True,
+        text=True,
+        timeout=45
+    )
 
-        output = result.stdout
+    output = result.stdout
 
     return render_template_string(HTML, output=output)
 
