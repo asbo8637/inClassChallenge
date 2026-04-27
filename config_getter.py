@@ -22,7 +22,7 @@ conn.enable()
 print("trying command on R1")
 output = conn.send_command_timing("show ip interface brief")
 print(output)
-output = conn.send_command_timing("show ip ospf neighbor")
+output = conn.send_command_timing("show ip ospf interface")
 print(output) 
 # Noticed R1 ethernet2 has wrong ip address. 
 
@@ -40,7 +40,7 @@ print(output)
 print("trying command on R2")
 output = conn.send_command_timing("show ip interface brief")
 print(output) # Noticed R2 ethernet2 is down.
-output = conn.send_command_timing("show ip ospf neighbor")
+output = conn.send_command_timing("show ip ospf interface")
 print(output) 
 
 # Now SSH from R2 to R3
@@ -58,7 +58,7 @@ print(output)
 print("trying command on R3")
 output = conn.send_command_timing("show ip interface brief")
 print(output)
-output = conn.send_command_timing("show ip ospf neighbor")
+output = conn.send_command_timing("show ip ospf interface")
 print(output) 
 
 
