@@ -22,7 +22,8 @@ conn.enable()
 print("trying command on R1")
 output = conn.send_command_timing("show ip interface brief")
 print(output)
-print("-----")
+output = conn.send_command_timing("show ip ospf neighbor")
+print(output) 
 # Noticed R1 ethernet2 has wrong ip address. 
 
 print("SSH from R1 to R2")
@@ -39,6 +40,8 @@ print(output)
 print("trying command on R2")
 output = conn.send_command_timing("show ip interface brief")
 print(output) # Noticed R2 ethernet2 is down.
+output = conn.send_command_timing("show ip ospf neighbor")
+print(output) 
 
 # Now SSH from R2 to R3
 print("SSH from R2 to R3")
@@ -52,8 +55,11 @@ if "Password" in output or "password" in output:
 
 print(output)
 
-print("trying command on R3...")
+print("trying command on R3")
 output = conn.send_command_timing("show ip interface brief")
 print(output)
+output = conn.send_command_timing("show ip ospf neighbor")
+print(output) 
+
 
 conn.disconnect()
