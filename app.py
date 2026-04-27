@@ -4,7 +4,6 @@ import subprocess
 app = Flask(__name__)
 
 R3_LOOPBACK_IP = "100.0.0.1"
-SOURCE_IP = "198.51.100.21"
 INTERFACE = "tap0"
 
 HTML = """
@@ -24,10 +23,7 @@ HTML = """
 
 @app.route("/", methods=["GET"])
 def index():
-    return render_template_string(
-        HTML,
-        output=""
-    )
+    return render_template_string(HTML, output="")
 
 @app.route("/traceroute", methods=["POST"])
 def traceroute():
@@ -35,7 +31,6 @@ def traceroute():
         command = [
             "traceroute",
             "-i", INTERFACE,
-            "-s", SOURCE_IP,
             R3_LOOPBACK_IP
         ]
 
@@ -46,20 +41,7 @@ def traceroute():
             timeout=45
         )
 
-        output = "$ " + " ".join(command) + "\n\n"
-        output += result.stdout
-
-        if result.stderr:
-            output += "\nSTDERR:\n" + result.stderr
-
-    except subprocess.TimeoutExpired:
-        output = "Traceroute timed out."
-    except FileNotFoundError:
-        output = "traceroute is not installed. Run: sudo apt install traceroute"
-    except Exception as e:
-        output = f"Error: {e}"
-
-    print(output)
+        output = result.stdout
 
     return render_template_string(HTML, output=output)
 
