@@ -1,5 +1,6 @@
 from netmiko import ConnectHandler
 
+
 R1_IP = "198.51.100.1"
 R2_IP = "198.52.100.2" 
 R3_IP = "198.53.100.1"
@@ -16,14 +17,23 @@ r1_conn_configs = {
     "secret": SECRET,
 }
 
+R1_commands = [
+    "interface GigabitEthernet2/0",
+    "ip address 198.52.100.1 255.255.255.0",
+    "no shutdown",
+]
+
+R2_commands = [
+    "interface GigabitEthernet2/0",
+    "no shutdown",
+]
+
 conn = ConnectHandler(**r1_conn_configs)
 conn.enable()
 
-print("trying command on R1")
-output = conn.send_command_timing("show ip interface brief")
+print("Applying R1 config")
+output = conn.send_config_set(R1_commands)
 print(output)
-print("-----")
-# Noticed R1 ethernet2 has wrong ip address. 
 
 print("SSH from R1 to R2")
 output = conn.send_command_timing(f"ssh -l {USERNAME} {R2_IP}")
@@ -33,27 +43,10 @@ if "yes/no" in output:
 
 if "Password" in output or "password" in output:
     output += conn.send_command_timing(PASSWORD)
-
 print(output)
 
-print("trying command on R2")
-output = conn.send_command_timing("show ip interface brief")
-print(output) # Noticed R2 ethernet2 is down.
-
-# Now SSH from R2 to R3
-print("SSH from R2 to R3")
-output = conn.send_command_timing(f"ssh -l {USERNAME} {R3_IP}")
-
-if "yes/no" in output:
-    output += conn.send_command_timing("yes")
-
-if "Password" in output or "password" in output:
-    output += conn.send_command_timing(PASSWORD)
-
-print(output)
-
-print("trying command on R3...")
-output = conn.send_command_timing("show ip interface brief")
+print("Applying R2 config")
+output = conn.send_config_set(R2_commands)
 print(output)
 
 conn.disconnect()
